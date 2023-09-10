@@ -301,7 +301,8 @@ class DataBasedNN():
         im = ax1.imshow(Ugrnd, origin='lower', aspect='auto',
                         extent=np.asarray(extent).flatten(), vmin=Ugrnd.min(),
                         vmax=Ugrnd.max(), interpolation='bilinear', cmap='rainbow')
-        fig.colorbar(im, ax=ax1, location='right')
+        clb = fig.colorbar(im, ax=ax1, location='right')
+        clb.ax.set_title('T')
         ax1.set_xlabel('x')
         ax1.set_ylabel('t')
         ax1.set_title('Actual, test/train split and slices', fontsize=12)
@@ -309,9 +310,10 @@ class DataBasedNN():
         line = np.linspace(t.detach().numpy().min(), t.detach().numpy().max(), 2).reshape(-1,1)
         nx = data.sol['x'].shape[0]
         nt = data.sol['t'].shape[0]
-        colors = plt.cm.plasma(np.linspace(0,1,len(xlocs)))
+        colors = plt.cm.brg(np.linspace(0,1,len(xlocs)))
         for i, xloc in enumerate(xlocs):
-            ax1.plot(data.sol['x'][int(xloc*nx)]*np.ones((2,1)), line, linestyle='--',linewidth=1,color=colors[i])
+            ax1.plot(data.sol['x'][int(xloc*nx)]*np.ones((2,1)), line, 
+                     linestyle='--',linewidth=1,color=colors[i], clip_on=False)
 
             ## Show the train and test split on the domain
         t_split = data.sol['t'][int(split*nt)]
@@ -330,7 +332,7 @@ class DataBasedNN():
         ax2.arrow(t_split, -0.1, 0.5, 0, width=0.02, facecolor='r', alpha=1)
         ax2.arrow(t_split, -0.2, -0.5, 0, width=0.02, facecolor='k', alpha=1)
         ax2.set_xlabel('t')
-        ax2.set_ylabel('u')
+        ax2.set_ylabel('T')
         lines=ax2.get_lines()
         legend1 = Legend(ax2, lines[:2], ['actual', 'predicted'], loc='upper right')
         ax2.add_artist(legend1)
@@ -344,7 +346,7 @@ class DataBasedNN():
         ax3.arrow(t_split, -0.1, 0.5, 0, width=0.02, facecolor='r', alpha=1)
         ax3.arrow(t_split, -0.2, -0.5, 0, width=0.02, facecolor='k', alpha=1)
         ax3.set_xlabel('t')
-        ax3.set_ylabel('u')
+        ax3.set_ylabel('T')
         lines=ax3.get_lines()
         legend2 = Legend(ax3, lines[:len(xlocs):1], ['x='+str(xloc) for xloc in xlocs], loc='upper left')
         ax3.add_artist(legend2)
@@ -360,7 +362,8 @@ class DataBasedNN():
         ax1.plot(data.sol['x'], t_split*np.ones((nx,1)), 'g--')
         ax1.arrow(x_test, t_split, 0, 0.5, width=0.02, facecolor='r', alpha=1)
         ax1.arrow(x_train, t_split, 0, -0.5, width=0.02, facecolor='k', alpha=1)
-        fig.colorbar(im1, ax=ax1, location='right')
+        clb1 = fig.colorbar(im1, ax=ax1, location='right')
+        clb1.ax.set_title('T')
         ax1.set_title('Actual', fontsize=12)
         ax1.set_xlabel('x')
         ax1.set_ylabel('t')
@@ -371,7 +374,8 @@ class DataBasedNN():
         ax2.plot(data.sol['x'], t_split*np.ones((nx,1)), 'g--')
         ax2.arrow(x_test, t_split, 0, 0.5, width=0.02, facecolor='r', alpha=1)
         ax2.arrow(x_train, t_split, 0, -0.5, width=0.02, facecolor='k', alpha=1)
-        fig.colorbar(im2, ax=ax2, location='right')
+        clb2 = fig.colorbar(im2, ax=ax2, location='right')
+        clb2.ax.set_title('T')
         ax2.set_title('Prediction', fontsize=12)
         ax2.set_xlabel('x')
         ax2.set_ylabel('t')
@@ -382,7 +386,8 @@ class DataBasedNN():
         ax3.plot(data.sol['x'], t_split*np.ones((nx,1)), 'g--')
         ax3.arrow(x_test, t_split, 0, 0.5, width=0.02, facecolor='r', alpha=1)
         ax3.arrow(x_train, t_split, 0, -0.5, width=0.02, facecolor='k', alpha=1)
-        fig.colorbar(im3, ax=ax3, location='right')
+        clb3 = fig.colorbar(im3, ax=ax3, location='right')        
+        clb3.ax.set_title('T')
         ax3.set_title(r'Error = $|Actual - Prediction|$', fontsize=12)
         ax2.set_xlabel('x')
         ax2.set_ylabel('t')
