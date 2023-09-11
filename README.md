@@ -18,7 +18,7 @@ The boundary conditions for this PDE are,
 
 $$ \\left.\\frac{\\partial T}{\\partial x}\\right\\vert_{(0,t)} = a(x, t) \\text{ and } \\left. T \\right\\vert_{(l,t)} = b(x, t)$$
 
-where,  
-$s(t)$ is the source term,  
-$i(x)$ is the initial temperature distribution on the domain,  
-$a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ respectively
+where,<br>
+$s(t)$ is the source term,<br>
+$i(x)$ is the initial temperature distribution on the domain,<br>
+$a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ respectively.
