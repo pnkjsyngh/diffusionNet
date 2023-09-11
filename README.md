@@ -1,6 +1,7 @@
 ## $${\color{blue}\mathbf{Solution \space of \space 1D \space transient \space diffusion \space PDE \space using \space Neural \space Networks}}$$ ##
 
-### Problem Defintion ###
+### $${\color{red}\mathbf{Problem \space defintion}}$$ ###
+
 The governing PDE for homogeneous 1D diffusion is given by,
 
 $$\\frac{\\partial T}{\\partial t} = \\frac{\\partial^2 T}{\\partial x^2}$$ 
