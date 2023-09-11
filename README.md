@@ -1,7 +1,4 @@
-# Solution of 1D transient diffusion PDE using Neural Networks 
-
-
-$${\color{red}Red}$$
+$${\color{blue}Solution of 1D transient diffusion PDE using Neural Networks }$$
 
 ### Problem Defintion ###
 The governing PDE for homogeneous 1D diffusion is given by,
