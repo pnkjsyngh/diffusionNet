@@ -22,3 +22,6 @@ where,<br>
 $s(t)$ is the source term,<br>
 $i(x)$ is the initial temperature distribution on the domain,<br>
 $a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ respectively.
+
+
+### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
