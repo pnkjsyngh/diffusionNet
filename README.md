@@ -4,7 +4,7 @@
 
 The governing PDE for homogeneous 1D diffusion is given by,
 
-$$\\frac{\\partial T}{\\partial t} = \\frac{\\partial^2 T}{\\partial x^2}$$ 
+$$\\frac{\\partial T}{\\partial t} = \\frac{\\partial^2 T}{\\partial x^2} + s(t) $$ 
 
 This PDE is valid for,
 
@@ -12,8 +12,8 @@ $$\\forall \\, x \\in (0,l) \\text{ and } 0 < t < t_{range}$$
 
 The initial condition for this PDE is, 
 
-$$T(x, 0) = 0 $$
+$$T(x, 0) = i(t) $$
 
 The boundary conditions for this PDE are,
 
-$$ \\left.\\frac{\\partial T}{\\partial x}\\right\\vert_{(0,t)} = 0 \\text{ and } \\left. T \\right\\vert_{(l,t)} = sin(t)$$
+$$ \\left.\\frac{\\partial T}{\\partial x}\\right\\vert_{(0,t)} = a(t) \\text{ and } \\left. T \\right\\vert_{(l,t)} = b(t)$$
