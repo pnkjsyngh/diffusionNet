@@ -1,9 +1,8 @@
-```diff
-## @ Solution of 1D transient diffusion PDE using Neural Networks @
-```
+# Solution of 1D transient diffusion PDE using Neural Networks 
 
 
-### Problem Defintion ##
+
+### Problem Defintion ###
 The governing PDE for homogeneous 1D diffusion is given by,
 
 $$\\frac{\\partial T}{\\partial t} = \\frac{\\partial^2 T}{\\partial x^2}$$ 
