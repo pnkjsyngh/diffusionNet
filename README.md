@@ -25,7 +25,8 @@ $a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ 
 <br>
 
 ### $${\color{red}\mathbf{Numerical \space solution}}$$ ###
-The numerical solution for this problem is obtained using 
+
+The numerical solution for this problem is obtained using [pypde](https://py-pde.readthedocs.io/en/latest/)
 
 ### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
 
