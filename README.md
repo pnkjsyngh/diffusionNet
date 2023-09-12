@@ -25,3 +25,5 @@ $a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ 
 <br>
 
 ### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
+
+[![name](link to image on GH)](link to your URL)
