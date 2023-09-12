@@ -32,7 +32,7 @@ The numerical solution for this problem is obtained using [py-pde](https://py-pd
 </p>
 
 
-![Ground Truth](https://github.com/pnkjsyngh/diffusionNet/blob/main/DatabasedNN/results/groundtruth.png)
+![Ground Truth](./DatabasedNN/results/groundtruth.png)
 ### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
 
 We used the data from 
