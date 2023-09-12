@@ -4,7 +4,7 @@
 
 The governing PDE for 1D diffusion is given by,
 
-$$\\frac{\\partial T}{\\partial t} = \\frac{\\partial^2 T}{\\partial x^2} + s(t)$$ 
+$$\\frac{\\partial T}{\\partial t} = D \\frac{\\partial^2 T}{\\partial x^2} + s(t)$$ 
 
 This PDE is valid for,
 
@@ -26,7 +26,7 @@ $a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ 
 
 ### $${\color{red}\mathbf{Numerical \space solution}}$$ ###
 
-The numerical solution for this problem is obtained using [py-pde](https://py-pde.readthedocs.io/en/latest/).
+The numerical solution for this problem is obtained using [py-pde](https://py-pde.readthedocs.io/en/latest/) for follwing set of 
 <p align="center">
   <img src="./DatabasedNN/results/groundtruth.png", width=400px>
 </p>
