@@ -29,6 +29,10 @@ class NumPDE():
 
         ## Organize the ground truth in torch compatible format
         self.get_ground_truth()
+        
+        ## Save the object into a pickle file
+        with open('saved/numSol.pkl', 'wb') as file:        
+            pkl.dump(self.ground_truth, file)
 
 
     ## Solve the PDE
