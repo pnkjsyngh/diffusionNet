@@ -24,10 +24,14 @@ class DataPreprocessor():
         ## Randomly pick data points out of the test and train datasets
         self.create_dataset('train', frac)
         self.create_dataset('test', frac)
-        self.ax.legend(bbox_to_anchor=(0.5, 1.1), ncol=2, loc='upper center')
+#         self.ax.legend(bbox_to_anchor=(0.5, 1.1), ncol=2, loc='upper center')
 
-        ## Show the plot
+        ## Show the plot and svae the figure
         plt.show()
+        plt.savefig('results/groundtruth.png')
+        
+        
+        
 
     ## Function to create the ground truth over the domain from the numerical solver data
     def create_ground_truth(self, sol):
@@ -129,9 +133,9 @@ class DataPreprocessor():
         inp_bdr = inp_all_bdr[idx_bdr, :]
         out_bdr = out_all_bdr[idx_bdr, :]
             ## Show the boundary points
-        self.ax.scatter(inp_bdr[:,0], inp_bdr[:,1], marker='x',
-                        c = color, s=15, clip_on=False, alpha=0.8,
-                        linewidth=1, label=which)
+#         self.ax.scatter(inp_bdr[:,0], inp_bdr[:,1], marker='x',
+#                         c = color, s=15, clip_on=False, alpha=0.8,
+#                         linewidth=1, label=which)
 
         ## Collect datapoint in the domain
         if which == 'train':
@@ -351,6 +355,8 @@ class DataBasedNN():
         legend2 = Legend(ax3, lines[:len(xlocs):1], ['x='+str(xloc) for xloc in xlocs], loc='upper left')
         ax3.add_artist(legend2)
         ax3.set_title('error along slices',fontsize=12)
+            ## Save the plot
+        plt.savefig('results/slices.png')
 
 
         ## Plot the ground truth, predictions and error ##
@@ -390,4 +396,6 @@ class DataBasedNN():
         clb3.ax.set_title('T')
         ax3.set_title(r'Error = $|Actual - Prediction|$', fontsize=12)
         ax2.set_xlabel('x')
-        ax2.set_ylabel('t')
+        ax2.set_ylabel('t')        
+            ## Save the plot
+        plt.savefig('results/contours.png')
