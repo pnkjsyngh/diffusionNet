@@ -4,7 +4,7 @@
 
 The governing PDE for 1D diffusion is given by,
 
-$$\\frac{\\partial T}{\\partial t} = \\frac{\\partial^2 T}{\\partial x^2} + s(t) \label{eq1}$$ 
+$$\\frac{\\partial T}{\\partial t} = \\frac{\\partial^2 T}{\\partial x^2} + s(t)$$ 
 
 This PDE is valid for,
 
@@ -24,7 +24,12 @@ $i(x)$ is the initial temperature distribution on the domain,<br>
 $a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ respectively.
 <br>
 
+### $${\color{red}\mathbf{Numerical \space solution}}$$ ###
+The numerical solution for this problem is obtained using 
+
 ### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
+
+We used the data from 
 ![slices](https://github.com/pnkjsyngh/diffusionNet/blob/main/DatabasedNN/results/contours.png)
 ![slices](https://github.com/pnkjsyngh/diffusionNet/blob/main/DatabasedNN/results/slices.png)
 
