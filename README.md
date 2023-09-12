@@ -30,6 +30,7 @@ The numerical solution for this problem is obtained using [py-pde](https://py-pd
 <p align="center">
   <img src="./DatabasedNN/results/groundtruth.png", width=300px>
 </p>
+
 ### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
 
 We used the data from 
