@@ -43,7 +43,7 @@ The specified functions are as follows,
 
 ### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
 
-We used the data from 
+With the use of the data from numerical solution one can train the a fully connected Neural Network. The training is done on $0.7 * t_{range}$ 
 
 <p align="center">
   <img src="./DatabasedNN/results/contours.png">
