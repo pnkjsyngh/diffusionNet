@@ -34,6 +34,11 @@ The numerical solution for this problem is obtained using [py-pde](https://py-pd
 ### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
 
 We used the data from 
-![slices](https://github.com/pnkjsyngh/diffusionNet/blob/main/DatabasedNN/results/contours.png)
-![slices](https://github.com/pnkjsyngh/diffusionNet/blob/main/DatabasedNN/results/slices.png)
 
+<p align="center">
+  <img src="./DatabasedNN/results/contours.png", width=300px>
+</p>
+
+<p align="center">
+  <img src="./DatabasedNN/results/slices.png", width=300px>
+</p>
