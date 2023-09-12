@@ -27,12 +27,15 @@ $a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ 
 ### $${\color{red}\mathbf{Numerical \space solution}}$$ ###
 
 The numerical solution for this problem is obtained using [py-pde](https://py-pde.readthedocs.io/en/latest/) for following set of system parameters,
-1. $D = 0.1$
-2. $l = 1$
-3. $t_{range} = 2\pi$
-   
-5. $s(x, t) = 0$
-6. $i(x) = 0$
+- $D = 0.1$
+- $l = 1$
+- $t_{range} = 2\pi$
+
+The specified functions are as follows,
+- $s(x, t) = 0$
+- $i(x) = 0$
+- $a(t) = 0$
+- $b(t) = sin(t)$
 
 <p align="center">
   <img src="./DatabasedNN/results/groundtruth.png", width=400px>
