@@ -28,7 +28,7 @@ $a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ 
 
 The numerical solution for this problem is obtained using [py-pde](https://py-pde.readthedocs.io/en/latest/).
 <p align="center">
-  <img src="./DatabasedNN/results/groundtruth.png">
+  <img src="./DatabasedNN/results/groundtruth.png", width=200px>
 </p>
 ### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
 
