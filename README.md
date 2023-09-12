@@ -2,8 +2,6 @@
 
 ### $${\color{red}\mathbf{Problem \space defintion}}$$ ###
 
-<hr style="border: 0.3px solid green; width:40%;"></hr>
-
 The governing PDE for 1D diffusion is given by,
 
 $$\\frac{\\partial T}{\\partial t} = \\frac{\\partial^2 T}{\\partial x^2} + s(t) $$ 
