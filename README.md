@@ -1,7 +1,8 @@
 ## $${\color{blue}\mathbf{Solution \space of \space 1D \space transient \space diffusion \space PDE \space using \space Neural \space Networks}}$$ ##
 
 ### $${\color{red}\mathbf{Problem \space defintion}}$$ ###
-#  #
+
+<hr style="border: 0.3px solid green; width:40%;"></hr>
 
 The governing PDE for 1D diffusion is given by,
 
