@@ -28,7 +28,7 @@ class DataPreprocessor():
 
         ## Show the plot and svae the figure
         plt.show()
-        plt.savefig('results/groundtruth.png')
+        self.fig.savefig('results/groundtruth.png')
         
         
         
@@ -87,6 +87,7 @@ class DataPreprocessor():
 
         ## Save the figure object
         self.ax = ax
+        self.fig = fig
 
     ## Function to create dataset out of provided grid and function values
     def create_dataset(self, which, frac):
