@@ -269,7 +269,10 @@ class DataBasedNN():
         ax.plot(self.losses['iter'], self.losses['train'], label='train')
         ax.plot(self.losses['iter'], self.losses['test'], label='test')
         ax.set_yscale('log')
+        ax.set_xlabel('iterations')
+        ax.set_ylabel('loss')
         ax.legend()
+        plt.savefig('results/losses.png')
 
 
     def predict(self, data, xlocs, split, extent):
