@@ -45,6 +45,8 @@ The specified functions are as follows,
 
 With the use of the data from numerical solution one can train the a fully connected Neural Network. The training is done on $t \in [0, 0.7 * t_{range}]$ and the model performance is evaluated on the rest of the the time range $t \in [0.7 * t_{range}, t_{range}]$
 
+The implementation can be found here in the [DatabasedNN](./DatabasedNN) subfolder.
+
 <p align="center">
   <img src="./DatabasedNN/results/losses.png", width=400px>
 </p>
