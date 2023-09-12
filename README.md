@@ -2,9 +2,7 @@
 
 ### $${\color{red}\mathbf{Problem \space defintion}}$$ ###
 
-#### 
-----
-####
+# - #
 
 The governing PDE for 1D diffusion is given by,
 
