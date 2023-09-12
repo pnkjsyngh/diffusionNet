@@ -36,9 +36,9 @@ The numerical solution for this problem is obtained using [py-pde](https://py-pd
 We used the data from 
 
 <p align="center">
-  <img src="./DatabasedNN/results/contours.png", width=300px>
+  <img src="./DatabasedNN/results/contours.png">
 </p>
 
 <p align="center">
-  <img src="./DatabasedNN/results/slices.png", width=300px>
+  <img src="./DatabasedNN/results/slices.png">
 </p>
