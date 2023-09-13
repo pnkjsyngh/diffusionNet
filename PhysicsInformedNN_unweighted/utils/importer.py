@@ -8,6 +8,7 @@ import torch
 from collections import OrderedDict
 from scipy.interpolate import griddata
 import pickle as pkl
+from pyDOE import lhs
 
 # CUDA support
 if torch.cuda.is_available():
