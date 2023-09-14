@@ -21,6 +21,9 @@ class DataPreprocessor():
         self.traindata = {}
         self.create_train_dataset(frac, N_f)
         
+        ## Save figure ##        
+        self.fig.savefig('results/ground_truth.png')
+        
     ## Function to create the ground truth over the domain from the numerical solver data
     def create_ground_truth(self):
 
@@ -181,7 +184,6 @@ class PINN():
         self.ttrain_pde = torch.tensor(data.traindata['pde']['inp'][:, 1:2], requires_grad=True).float().to(device)
 
         ## gather test data
-
         self.xtest = torch.tensor(data.ground_truth['inp'][:, 0:1], requires_grad=True).float().to(device)
         self.ttest = torch.tensor(data.ground_truth['inp'][:, 1:2], requires_grad=True).float().to(device)
         self.utest = torch.tensor(data.ground_truth['out']).float().to(device)
@@ -198,8 +200,8 @@ class PINN():
         # optimizers: using the same settings
         self.optimizer = torch.optim.LBFGS(self.dnn.parameters(),
                                            lr=.1,
-                                           max_iter=50000,
-                                           max_eval=50000,
+                                           max_iter=500000,
+                                           max_eval=500000,
                                            history_size=50,
                                            tolerance_grad=1e-8,
                                            tolerance_change=1.0 * np.finfo(float).eps,
@@ -263,13 +265,19 @@ class PINN():
         uhat_bcr = self.net_u(self.xtrain_bcr, self.ttrain_bcr)
         loss_bcr = torch.mean((self.utrain_bcr - uhat_bcr) ** 2)        
             ## Data on the domain ##
-        uhat_dom = self.net_u(self.xtrain_dom, self.ttrain_dom)
-        loss_dom = torch.mean((self.utrain_dom - uhat_dom) ** 2)
+        if self.xtrain_dom.shape[0] == 0:
+            loss_dom = torch.tensor(0).float().to(device)
+        else:
+            uhat_dom = self.net_u(self.xtrain_dom, self.ttrain_dom)
+            loss_dom = torch.mean((self.utrain_dom - uhat_dom) ** 2)
             ## PDE loss on the collocation points ##
-        pde_val = self.net_f(self.xtrain_pde, self.ttrain_pde)
-        loss_pde = torch.mean(pde_val ** 2)
+        if self.xtrain_pde.shape[0] == 0:
+            loss_pde = torch.tensor(0).float().to(device)
+        else:
+            pde_val = self.net_f(self.xtrain_pde, self.ttrain_pde)
+            loss_pde = torch.mean(pde_val ** 2)
             ## Final loss ##
-        loss_train = loss_ic + loss_bcl + loss_bcr + loss_dom + loss_pde
+        loss_train = loss_ic + loss_bcl + loss_bcr + loss_pde + loss_dom
         
         ## Test Loss ##
         uhat_test = self.net_u(self.xtest, self.ttest)
@@ -278,15 +286,15 @@ class PINN():
 
         loss_train.backward()
         self.iter += 1
-        if self.iter % 100 == 0:
-            self.losses['train'].append(loss_train.item())
-            self.losses['train_ic'].append(loss_ic.item())
-            self.losses['train_bcl'].append(loss_bcl.item())
-            self.losses['train_bcr'].append(loss_bcr.item())
-            self.losses['train_dom'].append(loss_dom.item())
-            self.losses['train_pde'].append(loss_pde.item())
-            self.losses['test'].append(loss_test.item())
-            self.losses['iter'].append(self.iter)
+        self.losses['train'].append(loss_train.item())
+        self.losses['train_ic'].append(loss_ic.item())
+        self.losses['train_bcl'].append(loss_bcl.item())
+        self.losses['train_bcr'].append(loss_bcr.item())
+        self.losses['train_dom'].append(loss_dom.item())
+        self.losses['train_pde'].append(loss_pde.item())
+        self.losses['test'].append(loss_test.item())
+        self.losses['iter'].append(self.iter)
+        if self.iter % 100 == 0:            
             print(
                 'Iter %d, Loss train: %.5e, Loss test: %.5e' % (self.iter, loss_train.item(), loss_test.item())
             )
@@ -298,14 +306,18 @@ class PINN():
         # Backward and optimize
         self.optimizer.step(self.loss_func)
 
+        ## Save the losses dictionary 
+        with open('saved/losses.pkl', 'wb') as file:        
+            pkl.dump(self.losses, file)
+            
         ## Plot the losses
         fig, ax = plt.subplots(figsize=(6,5))
         ax.plot(self.losses['iter'], self.losses['train'], label='train')
-#         ax.plot(self.losses['iter'], self.losses['train_ic'], label='IC')        
-#         ax.plot(self.losses['iter'], self.losses['train_bcl'], label='BC left')  
-#         ax.plot(self.losses['iter'], self.losses['train_bcr'], label='BC right')  
-#         ax.plot(self.losses['iter'], self.losses['train_dom'], label='Data')
-#         ax.plot(self.losses['iter'], self.losses['train_pde'], label='pde')
+        ax.plot(self.losses['iter'], self.losses['train_ic'], label='IC')        
+        ax.plot(self.losses['iter'], self.losses['train_bcl'], label='BC left')  
+        ax.plot(self.losses['iter'], self.losses['train_bcr'], label='BC right')  
+        ax.plot(self.losses['iter'], self.losses['train_dom'], label='Data')
+        ax.plot(self.losses['iter'], self.losses['train_pde'], label='pde')
         ax.plot(self.losses['iter'], self.losses['test'], label='test')
         ax.set_yscale('log')
         ax.set_xlabel('iterations')
@@ -333,6 +345,9 @@ class PINN():
         
         ## Evaluate error on the domain
         error = np.abs(Upred - Utrue)
+        
+        ## Print the total error over the whole domain ##
+        print('Total average error on the prediction w.r.t ground truth =', sum(sum(error))/error.shape[0]/error.shape[1])
         
         ## Plot the ground truth, predictions and error ##
         fig, (ax1, ax2, ax3) = plt.subplots(ncols = 3, nrows=1, figsize=(18, 5))
