@@ -155,24 +155,42 @@ class DNN(torch.nn.Module):
     def forward(self, x):
         out = self.layers(x)
         return out
-    
 
-class DataBasedNN():
-    def __init__(self, data, layers):
+class PINN():
+    def __init__(self, data, layers, diffusivity):
 
-        ## gather train data
-        self.xtrain = torch.tensor(data['train']['input'][:, 0:1], requires_grad=True).float().to(device)
-        self.ttrain = torch.tensor(data['train']['input'][:, 1:2], requires_grad=True).float().to(device)
-        self.utrain = torch.tensor(data['train']['output']).float().to(device)
+        ## gather train data ##
+            ## Initial Condition ##
+        self.xtrain_ic = torch.tensor(data.traindata['ic']['inp'][:, 0:1], requires_grad=True).float().to(device)
+        self.ttrain_ic = torch.tensor(data.traindata['ic']['inp'][:, 1:2], requires_grad=True).float().to(device)
+        self.utrain_ic = torch.tensor(data.traindata['ic']['out']).float().to(device)        
+            ## Boundary Condition Left ##
+        self.xtrain_bcl = torch.tensor(data.traindata['bcl']['inp'][:, 0:1], requires_grad=True).float().to(device)
+        self.ttrain_bcl = torch.tensor(data.traindata['bcl']['inp'][:, 1:2], requires_grad=True).float().to(device)
+        self.utrain_bcl = torch.tensor(data.traindata['bcl']['out']).float().to(device)   
+            ## Boundary Condition Right ##
+        self.xtrain_bcr = torch.tensor(data.traindata['bcr']['inp'][:, 0:1], requires_grad=True).float().to(device)
+        self.ttrain_bcr = torch.tensor(data.traindata['bcr']['inp'][:, 1:2], requires_grad=True).float().to(device)
+        self.utrain_bcr = torch.tensor(data.traindata['bcr']['out']).float().to(device)   
+            ## Domain data ##
+        self.xtrain_dom = torch.tensor(data.traindata['dom']['inp'][:, 0:1], requires_grad=True).float().to(device)
+        self.ttrain_dom = torch.tensor(data.traindata['dom']['inp'][:, 1:2], requires_grad=True).float().to(device)
+        self.utrain_dom = torch.tensor(data.traindata['dom']['out']).float().to(device)           
+            ## PDE loss collocation points ##
+        self.xtrain_pde = torch.tensor(data.traindata['pde']['inp'][:, 0:1], requires_grad=True).float().to(device)
+        self.ttrain_pde = torch.tensor(data.traindata['pde']['inp'][:, 1:2], requires_grad=True).float().to(device)
 
         ## gather test data
 
-        self.xtest = torch.tensor(data['test']['input'][:, 0:1], requires_grad=True).float().to(device)
-        self.ttest = torch.tensor(data['test']['input'][:, 1:2], requires_grad=True).float().to(device)
-        self.utest = torch.tensor(data['test']['output']).float().to(device)
+        self.xtest = torch.tensor(data.ground_truth['inp'][:, 0:1], requires_grad=True).float().to(device)
+        self.ttest = torch.tensor(data.ground_truth['inp'][:, 1:2], requires_grad=True).float().to(device)
+        self.utest = torch.tensor(data.ground_truth['out']).float().to(device)
 
         ## Assign layers
         self.layers = layers
+        
+        ## diffusivity ##
+        self.diffusivity = diffusivity
 
         # deep neural networks
         self.dnn = DNN(layers).to(device)
@@ -186,26 +204,75 @@ class DataBasedNN():
                                            tolerance_grad=1e-8,
                                            tolerance_change=1.0 * np.finfo(float).eps,
                                            line_search_fn="strong_wolfe")
-        # self.optimizer = torch.optim.SGD(self.dnn.parameters(),
-        #                                  lr=1e-4)
+#         self.optimizer = torch.optim.Adam(self.dnn.parameters())
 
         self.iter = 0
         self.losses = {'train': [],
+                       'train_ic': [],
+                       'train_bcl': [],
+                       'train_bcr': [],
+                       'train_dom': [],
+                       'train_pde': [],                       
                        'test': [],
                        'iter': []}
 
     def net_u(self, x, t):
         u = self.dnn(torch.cat([x, t], dim=1))
         return u
-
+    
+    def net_dudx(self, x, t):
+        
+        u = self.net_u(x, t)
+        dudx = torch.autograd.grad(u, x, 
+                                   grad_outputs=torch.ones_like(u),
+                                   retain_graph=True,
+                                   create_graph=True)[0]
+        return dudx
+    
+    def net_f(self, x, t):
+        """ The pytorch autograd version of calculating residual """
+        u = self.net_u(x, t)
+        
+        dudt = torch.autograd.grad(u, t,
+                                   grad_outputs=torch.ones_like(u),
+                                   retain_graph=True,
+                                   create_graph=True)[0]        
+        dudx = torch.autograd.grad(u, x,
+                                   grad_outputs=torch.ones_like(u),
+                                   retain_graph=True,
+                                   create_graph=True)[0]
+        ddudxx = torch.autograd.grad(dudx, x, 
+                                     grad_outputs=torch.ones_like(dudx),
+                                     retain_graph=True,
+                                     create_graph=True)[0]
+        f = dudt - self.diffusivity * ddudxx
+        return f
+    
     def loss_func(self):
 
         self.optimizer.zero_grad()
 
-        uhat_train = self.net_u(self.xtrain, self.ttrain)
+        ## Training Losses ##
+            ## Initial condition ##
+        uhat_ic = self.net_u(self.xtrain_ic, self.ttrain_ic)
+        loss_ic = torch.mean((self.utrain_ic - uhat_ic) ** 2)
+            ## Boundary condition left ##
+        dudxhat_bcl = self.net_dudx(self.xtrain_bcl, self.ttrain_bcl)
+        loss_bcl = torch.mean((dudxhat_bcl) ** 2)
+            ## Boundary condition right ##
+        uhat_bcr = self.net_u(self.xtrain_bcr, self.ttrain_bcr)
+        loss_bcr = torch.mean((self.utrain_bcr - uhat_bcr) ** 2)        
+            ## Data on the domain ##
+        uhat_dom = self.net_u(self.xtrain_dom, self.ttrain_dom)
+        loss_dom = torch.mean((self.utrain_dom - uhat_dom) ** 2)
+            ## PDE loss on the collocation points ##
+        pde_val = self.net_f(self.xtrain_pde, self.ttrain_pde)
+        loss_pde = torch.mean(pde_val ** 2)
+            ## Final loss ##
+        loss_train = loss_ic + loss_bcl + loss_bcr + loss_dom + loss_pde
+        
+        ## Test Loss ##
         uhat_test = self.net_u(self.xtest, self.ttest)
-
-        loss_train = torch.mean((self.utrain - uhat_train) ** 2)
         loss_test = torch.mean((self.utest - uhat_test) ** 2)
 
 
@@ -213,6 +280,11 @@ class DataBasedNN():
         self.iter += 1
         if self.iter % 100 == 0:
             self.losses['train'].append(loss_train.item())
+            self.losses['train_ic'].append(loss_ic.item())
+            self.losses['train_bcl'].append(loss_bcl.item())
+            self.losses['train_bcr'].append(loss_bcr.item())
+            self.losses['train_dom'].append(loss_dom.item())
+            self.losses['train_pde'].append(loss_pde.item())
             self.losses['test'].append(loss_test.item())
             self.losses['iter'].append(self.iter)
             print(
@@ -229,6 +301,11 @@ class DataBasedNN():
         ## Plot the losses
         fig, ax = plt.subplots(figsize=(6,5))
         ax.plot(self.losses['iter'], self.losses['train'], label='train')
+#         ax.plot(self.losses['iter'], self.losses['train_ic'], label='IC')        
+#         ax.plot(self.losses['iter'], self.losses['train_bcl'], label='BC left')  
+#         ax.plot(self.losses['iter'], self.losses['train_bcr'], label='BC right')  
+#         ax.plot(self.losses['iter'], self.losses['train_dom'], label='Data')
+#         ax.plot(self.losses['iter'], self.losses['train_pde'], label='pde')
         ax.plot(self.losses['iter'], self.losses['test'], label='test')
         ax.set_yscale('log')
         ax.set_xlabel('iterations')
@@ -236,132 +313,91 @@ class DataBasedNN():
         ax.legend()
         plt.savefig('results/losses.png')
 
-
-    def predict(self, data, xlocs, split, extent):
-
-        ## Obtain the input for the whole domain
-        input = data.data['all']['input']
-        x = torch.tensor(input[:, 0:1], requires_grad=True).float().to(device)
-        t = torch.tensor(input[:, 1:2], requires_grad=True).float().to(device)
+    def predict(self, data, xlocs, extent):
 
         ## Get the evaluation on the domain
         self.dnn.eval()
-        uhat = self.net_u(x, t)
-        uhat = uhat.detach().cpu().numpy()
-
-        ## Get the ground data
-        Ugrnd = data.sol['u']
-
-        ## Extract the x and time data to convert into grid data
+        upred = self.net_u(self.xtest, self.ttest)
+        upred = upred.detach().cpu().numpy()
+        
+        ## Extract the x and t data to convert into grid data
         X, T = np.meshgrid(data.sol['x'], data.sol['t'])
 
         ## Get the grid evaluation of prediction
-        Uhat = griddata(input,
-                        uhat.flatten(),
-                        (X, T), method='cubic')
-
+        Upred = griddata(data.ground_truth['inp'],
+                         upred.flatten(),
+                         (X, T), method='cubic')
+        
+        ## Get the ground data on the domain
+        Utrue = data.sol['u']
+        
         ## Evaluate error on the domain
-        error = np.abs(Uhat - Ugrnd)
-
-        ################# PLOTTING ###################
-
+        error = np.abs(Upred - Utrue)
+        
+        ## Plot the ground truth, predictions and error ##
+        fig, (ax1, ax2, ax3) = plt.subplots(ncols = 3, nrows=1, figsize=(18, 5))
+            ## Ground Truth ##
+        im1 = ax1.imshow(Utrue, origin='lower', aspect='auto',
+                        extent=np.asarray(extent).flatten(), vmin=Utrue.min(),
+                        vmax=Utrue.max(), interpolation='bilinear', cmap='rainbow')
+        clb1 = fig.colorbar(im1, ax=ax1, location='right')
+        clb1.ax.set_title('T')
+        ax1.set_title('Actual', fontsize=12)
+        ax1.set_xlabel('x')
+        ax1.set_ylabel('t')
+            ## Prediction ##
+        im2 = ax2.imshow(Upred, origin='lower', aspect='auto',
+                         extent=np.asarray(extent).flatten(), vmin=Utrue.min(),
+                         vmax=Utrue.max(), interpolation='bilinear', cmap='rainbow')
+        clb2 = fig.colorbar(im2, ax=ax2, location='right')
+        clb2.ax.set_title('T')
+        ax2.set_title('Prediction', fontsize=12)
+        ax2.set_xlabel('x')
+        ax2.set_ylabel('t')
+            ## Error ##
+        im3 = ax3.imshow(error, origin='lower', aspect='auto',
+                         extent=np.asarray(extent).flatten(),
+                         interpolation='bilinear', cmap='rainbow')
+        clb3 = fig.colorbar(im3, ax=ax3, location='right')        
+        clb3.ax.set_title('T')
+        ax3.set_title(r'Error = $|Actual - Prediction|$', fontsize=12)
+        ax2.set_xlabel('x')
+        ax2.set_ylabel('t')                
+            ## Save the plot
+        plt.savefig('results/contours.png')
+        
         ## Show the location of certain slices ##
         fig, (ax1, ax2, ax3) = plt.subplots(ncols = 3, nrows=1, figsize=(18, 5))
             ## Generate the contour
-        im = ax1.imshow(Ugrnd, origin='lower', aspect='auto',
-                        extent=np.asarray(extent).flatten(), vmin=Ugrnd.min(),
-                        vmax=Ugrnd.max(), interpolation='bilinear', cmap='rainbow')
+        im = ax1.imshow(Utrue, origin='lower', aspect='auto',
+                        extent=np.asarray(extent).flatten(), vmin=Utrue.min(),
+                        vmax=Utrue.max(), interpolation='bilinear', cmap='rainbow')
         clb = fig.colorbar(im, ax=ax1, location='right')
         clb.ax.set_title('T')
         ax1.set_xlabel('x')
         ax1.set_ylabel('t')
         ax1.set_title('Actual, test/train split and slices', fontsize=12)
             ## Generate and plot the lines
-        line = np.linspace(t.detach().numpy().min(), t.detach().numpy().max(), 2).reshape(-1,1)
+        line = np.linspace(data.sol['t'].min(), data.sol['t'].max(), 2).reshape(-1,1)
         nx = data.sol['x'].shape[0]
-        nt = data.sol['t'].shape[0]
         colors = plt.cm.brg(np.linspace(0,1,len(xlocs)))
         for i, xloc in enumerate(xlocs):
             ax1.plot(data.sol['x'][int(xloc*nx)]*np.ones((2,1)), line, 
                      linestyle='--',linewidth=1,color=colors[i], clip_on=False)
-
-            ## Show the train and test split on the domain
-        t_split = data.sol['t'][int(split*nt)]
-        x_test = data.sol['x'][int(0.4*nx)]
-        x_train = data.sol['x'][int(0.6*nx)]
-        ax1.plot(data.sol['x'], t_split*np.ones((nx,1)), 'g--')
-        ax1.arrow(x_test, t_split, 0, 0.5, width=0.02, facecolor='r', alpha=1)
-        ax1.arrow(x_train, t_split, 0, -0.5, width=0.02, facecolor='k', alpha=1)
-        ax1.annotate('Test', xy=(x_test-0.05, t_split+0.7), fontsize=12, color = 'r')
-        ax1.annotate('Train', xy=(x_train-0.05, t_split-0.8), fontsize=12, color = 'k')
             ## Show the output variable along certain slices ##
         for i, xloc in enumerate(xlocs):
-            ax2.plot(data.sol['t'], Ugrnd[:,int(xloc*nx)], c=colors[i], linewidth=2, alpha=0.7)
-            ax2.plot(data.sol['t'], Uhat[:,int(xloc*nx)], c=colors[i], linestyle='--', linewidth=2)
-        ax2.axvline(t_split, color='g', linestyle='--')
-        ax2.arrow(t_split, -0.1, 0.5, 0, width=0.02, facecolor='r', alpha=1)
-        ax2.arrow(t_split, -0.2, -0.5, 0, width=0.02, facecolor='k', alpha=1)
-        ax2.set_xlabel('t')
-        ax2.set_ylabel('T')
+            ax2.plot(data.sol['t'], Utrue[:,int(xloc*nx)], c=colors[i], linewidth=2, alpha=0.7)
+            ax2.plot(data.sol['t'], Upred[:,int(xloc*nx)], c=colors[i], linestyle='--', linewidth=2)        
         lines=ax2.get_lines()
-        legend1 = Legend(ax2, lines[:2], ['actual', 'predicted'], loc='upper right')
-        ax2.add_artist(legend1)
-        legend2 = Legend(ax2, lines[:2*len(xlocs):2], ['x='+str(xloc) for xloc in xlocs], loc='lower left')
-        ax2.add_artist(legend2)
-        ax2.set_title('solution along slices',fontsize=12)
+        legend = Legend(ax2, lines[:2*len(xlocs):2], ['x='+str(xloc) for xloc in xlocs])
+        ax2.add_artist(legend)
+        ax2.set_title('solution along slices',fontsize=12)        
             ## Show the error in result along slices
         for i, xloc in enumerate(xlocs):
-            ax3.plot(data.sol['t'], np.abs(Ugrnd[:,int(xloc*nx)] - Uhat[:,int(xloc*nx)]), c=colors[i], linewidth=2)
-        ax3.axvline(t_split, color='g', linestyle='--')
-        ax3.arrow(t_split, -0.1, 0.5, 0, width=0.02, facecolor='r', alpha=1)
-        ax3.arrow(t_split, -0.2, -0.5, 0, width=0.02, facecolor='k', alpha=1)
-        ax3.set_xlabel('t')
-        ax3.set_ylabel('T')
+            ax3.plot(data.sol['t'], np.abs(Utrue[:,int(xloc*nx)] - Upred[:,int(xloc*nx)]), c=colors[i], linewidth=2)
         lines=ax3.get_lines()
-        legend2 = Legend(ax3, lines[:len(xlocs):1], ['x='+str(xloc) for xloc in xlocs], loc='upper left')
-        ax3.add_artist(legend2)
+        legend = Legend(ax3, lines, ['x='+str(xloc) for xloc in xlocs])
+        ax3.add_artist(legend)
         ax3.set_title('error along slices',fontsize=12)
             ## Save the plot
         plt.savefig('results/slices.png')
-
-
-        ## Plot the ground truth, predictions and error ##
-        fig, (ax1, ax2, ax3) = plt.subplots(ncols = 3, nrows=1, figsize=(18, 5))
-            ## Ground Truth
-        im1 = ax1.imshow(Ugrnd, origin='lower', aspect='auto',
-                        extent=np.asarray(extent).flatten(), vmin=Ugrnd.min(),
-                        vmax=Ugrnd.max(), interpolation='bilinear', cmap='rainbow')
-        ax1.plot(data.sol['x'], t_split*np.ones((nx,1)), 'g--')
-        ax1.arrow(x_test, t_split, 0, 0.5, width=0.02, facecolor='r', alpha=1)
-        ax1.arrow(x_train, t_split, 0, -0.5, width=0.02, facecolor='k', alpha=1)
-        clb1 = fig.colorbar(im1, ax=ax1, location='right')
-        clb1.ax.set_title('T')
-        ax1.set_title('Actual', fontsize=12)
-        ax1.set_xlabel('x')
-        ax1.set_ylabel('t')
-            ## Prediction
-        im2 = ax2.imshow(Uhat, origin='lower', aspect='auto',
-                        extent=np.asarray(extent).flatten(), vmin=Ugrnd.min(),
-                        vmax=Ugrnd.max(), interpolation='bilinear', cmap='rainbow')
-        ax2.plot(data.sol['x'], t_split*np.ones((nx,1)), 'g--')
-        ax2.arrow(x_test, t_split, 0, 0.5, width=0.02, facecolor='r', alpha=1)
-        ax2.arrow(x_train, t_split, 0, -0.5, width=0.02, facecolor='k', alpha=1)
-        clb2 = fig.colorbar(im2, ax=ax2, location='right')
-        clb2.ax.set_title('T')
-        ax2.set_title('Prediction', fontsize=12)
-        ax2.set_xlabel('x')
-        ax2.set_ylabel('t')
-            ## Error
-        im3 = ax3.imshow(error, origin='lower', aspect='auto',
-                        extent=np.asarray(extent).flatten(),
-                        interpolation='bilinear', cmap='rainbow')
-        ax3.plot(data.sol['x'], t_split*np.ones((nx,1)), 'g--')
-        ax3.arrow(x_test, t_split, 0, 0.5, width=0.02, facecolor='r', alpha=1)
-        ax3.arrow(x_train, t_split, 0, -0.5, width=0.02, facecolor='k', alpha=1)
-        clb3 = fig.colorbar(im3, ax=ax3, location='right')        
-        clb3.ax.set_title('T')
-        ax3.set_title(r'Error = $|Actual - Prediction|$', fontsize=12)
-        ax2.set_xlabel('x')
-        ax2.set_ylabel('t')        
-            ## Save the plot
-        plt.savefig('results/contours.png')
