@@ -41,7 +41,7 @@ The specified functions are as follows,
   <img src="./DatabasedNN/results/groundtruth.png", width=400px>
 </p>
 
-### $${\color{red}\mathbf{\text{PINNs with unweighted loss function}}}$$ ###
+### $${\color{red}\mathbf{\text{Physics Informed Neural Networks (PINNs) with unweighted loss function}}}$$ ###
 
 With the use of the data from numerical solution one can train the a fully connected Neural Network. The training is done on $t \in [0, 0.7 * t_{range}]$ and the model performance is evaluated on the rest of the the time range $t \in [0.7 * t_{range}, t_{range}]$
 
