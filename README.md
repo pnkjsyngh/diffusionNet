@@ -56,13 +56,13 @@ $\mathcal{L_{PDE}}$ is the loss from PDE at collocation points.<br>
 As it can be noted, we have presented the loss as simple sum of losses coming from IC, BC and PDE. The implementation can be found in the [PINNs unweighted loss](./PhysicsInformedNN_unweighted/only%20physics) folder.
 
 <p align="center">
-  <img src="./DatabasedNN/results/losses.png", width=400px>
+  <img src="./PhysicsInformedNN_unweighted/only%20physics/results/losses.png", width=400px>
 </p>
 
 <p align="center">
-  <img src="./DatabasedNN/results/contours.png">
+  <img src="./PhysicsInformedNN_unweighted/only%20physics/results/contours.png">
 </p>
 
 <p align="center">
-  <img src="./DatabasedNN/results/slices.png">
+  <img src="./PhysicsInformedNN_unweighted/only%20physics/results/slices.png">
 </p>
