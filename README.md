@@ -43,7 +43,7 @@ The specified functions are as follows,
 
 ### $${\color{red}\mathbf{\text{Physics Informed Neural Networks (PINNs) with unweighted loss function}}}$$ ###
 
-$$\mathcal{L} = \mathcal{L}_I$$
+$$\mathcal{L} = \mathcal{L}_IC$$
 
 The implementation can be found here in the [DatabasedNN](./DatabasedNN) subfolder.
 
