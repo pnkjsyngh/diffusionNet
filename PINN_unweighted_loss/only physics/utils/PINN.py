@@ -48,7 +48,10 @@ class DataPreprocessor():
         im = ax.imshow(self.sol['u'], origin='lower', aspect='auto',
                        extent=np.asarray(self.extent).flatten(),
                        interpolation='bilinear', cmap='rainbow')
-        fig.colorbar(im, ax=ax, location='right')
+        clb = fig.colorbar(im, ax=ax, location='right')
+        clb.ax.set_title('T')
+        ax.set_xlabel('x')
+        ax.set_ylabel('t')
 
         ## Save the figure object
         self.ax = ax
@@ -410,8 +413,8 @@ class PINN():
         clb3 = fig.colorbar(im3, ax=ax3, location='right')        
         clb3.ax.set_title('T')
         ax3.set_title(r'Error = $|Actual - Prediction|$', fontsize=12)
-        ax2.set_xlabel('x')
-        ax2.set_ylabel('t')                
+        ax3.set_xlabel('x')
+        ax3.set_ylabel('t')                
             ## Save the plot
         plt.savefig('results/contours.png')
         
@@ -436,14 +439,18 @@ class PINN():
             ## Show the output variable along certain slices ##
         for i, xloc in enumerate(xlocs):
             ax2.plot(data.sol['t'], Utrue[:,int(xloc*nx)], c=colors[i], linewidth=2, alpha=0.7)
-            ax2.plot(data.sol['t'], Upred[:,int(xloc*nx)], c=colors[i], linestyle='--', linewidth=2)        
+            ax2.plot(data.sol['t'], Upred[:,int(xloc*nx)], c=colors[i], linestyle='--', linewidth=2)   
+        ax2.set_xlabel('t')
+        ax2.set_ylabel('T')
         lines=ax2.get_lines()
         legend = Legend(ax2, lines[:2*len(xlocs):2], ['x='+str(xloc) for xloc in xlocs])
         ax2.add_artist(legend)
         ax2.set_title('solution along slices',fontsize=12)        
             ## Show the error in result along slices
         for i, xloc in enumerate(xlocs):
-            ax3.plot(data.sol['t'], np.abs(Utrue[:,int(xloc*nx)] - Upred[:,int(xloc*nx)]), c=colors[i], linewidth=2)
+            ax3.plot(data.sol['t'], np.abs(Utrue[:,int(xloc*nx)] - Upred[:,int(xloc*nx)]), c=colors[i], linewidth=2) 
+        ax3.set_xlabel('t')
+        ax3.set_ylabel('T')
         lines=ax3.get_lines()
         legend = Legend(ax3, lines, ['x='+str(xloc) for xloc in xlocs])
         ax3.add_artist(legend)
