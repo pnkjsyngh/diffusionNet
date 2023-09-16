@@ -53,7 +53,7 @@ $\mathcal{L_{IC}}$ is the loss from initial conditions at $t=0$ over the domain,
 $\mathcal{L_{BC}}$ is the loss from boundary conditions at boundaries ($x=0$ and $1$) over time,<br>
 $\mathcal{L_{PDE}}$ is the loss from PDE at collocation points.<br>
 
-As it can be noted, we have presented the loss as simple sum of losses coming from IC, BC and PDE. The implementation can be found in the [PINNs unweighted loss](./DatabasedNN) folder.
+As it can be noted, we have presented the loss as simple sum of losses coming from IC, BC and PDE. The implementation can be found in the [PINNs unweighted loss](./PhysicsInformedNN_unweighted/only%20physics) folder.
 
 <p align="center">
   <img src="./DatabasedNN/results/losses.png", width=400px>
