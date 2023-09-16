@@ -38,23 +38,31 @@ The specified functions are as follows,
 - $b(t) = sin(t)$
 
 <p align="center">
-  <img src="./DatabasedNN/results/groundtruth.png", width=400px>
+  <img src="./PhysicsInformedNN_unweighted/only%20physics/results/ground_truth.png", width=400px>
 </p>
 
-### $${\color{red}\mathbf{Data \space based \space Neural \space Networks}}$$ ###
+### $${\color{red}\mathbf{\text{Physics Informed Neural Networks (PINNs) with unweighted loss function}}}$$ ###
 
-With the use of the data from numerical solution one can train the a fully connected Neural Network. The training is done on $t \in [0, 0.7 * t_{range}]$ and the model performance is evaluated on the rest of the the time range $t \in [0.7 * t_{range}, t_{range}]$
+We define the fully physics based loss function as follows for training our neural network,
 
-The implementation can be found here in the [DatabasedNN](./DatabasedNN) subfolder.
+$$\mathcal{L} = \mathcal{L_{IC}} + \mathcal{L_{BC}} + \mathcal{L_{PDE}}$$
+
+where,<br>
+$\mathcal{L}$ is the overall loss,<br>
+$\mathcal{L_{IC}}$ is the loss from initial conditions at $t=0$ over the domain,<br>
+$\mathcal{L_{BC}}$ is the loss from boundary conditions at boundaries ($x=0$ and $1$) over time,<br>
+$\mathcal{L_{PDE}}$ is the loss from PDE at collocation points.<br>
+
+As it can be noted, we have presented the loss as simple sum of losses coming from IC, BC and PDE. The implementation can be found in the [PINNs unweighted loss](./PhysicsInformedNN_unweighted/only%20physics) folder.
 
 <p align="center">
-  <img src="./DatabasedNN/results/losses.png", width=400px>
+  <img src="./PhysicsInformedNN_unweighted/only%20physics/results/losses.png", width=400px>
 </p>
 
 <p align="center">
-  <img src="./DatabasedNN/results/contours.png">
+  <img src="./PhysicsInformedNN_unweighted/only%20physics/results/contours.png">
 </p>
 
 <p align="center">
-  <img src="./DatabasedNN/results/slices.png">
+  <img src="./PhysicsInformedNN_unweighted/only%20physics/results/slices.png">
 </p>
