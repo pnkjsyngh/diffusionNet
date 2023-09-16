@@ -38,7 +38,7 @@ The specified functions are as follows,
 - $b(t) = sin(t)$
 
 <p align="center">
-  <img src="./DatabasedNN/results/groundtruth.png", width=400px>
+  <img src="./PhysicsInformedNN_unweighted/only%20physics/results/groundtruth.png", width=400px>
 </p>
 
 ### $${\color{red}\mathbf{\text{Physics Informed Neural Networks (PINNs) with unweighted loss function}}}$$ ###
