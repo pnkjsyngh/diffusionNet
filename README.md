@@ -43,7 +43,15 @@ The specified functions are as follows,
 
 ### $${\color{red}\mathbf{\text{Physics Informed Neural Networks (PINNs) with unweighted loss function}}}$$ ###
 
+We define the fully physics based loss function as follows for training our neural network,
+
 $$\mathcal{L} = \mathcal{L_{IC}} + \mathcal{L_{BC}} + \mathcal{L_{PDE}}$$
+
+where,<br>
+$\mathcal{L}$ is the overall loss,<br>
+$\mathcal{L_{IC}}$ is the loss from initial conditions at $t=0$ over the domain,<br>
+$\mathcal{L_{BC}}$ is the loss from boundary conditions at boundaries ($x=0$ and $1$) over time,<br>
+$\mathcal{L_{PDE}}$ is the loss from PDE at collocation points.<br>
 
 The implementation can be found here in the [DatabasedNN](./DatabasedNN) subfolder.
 
