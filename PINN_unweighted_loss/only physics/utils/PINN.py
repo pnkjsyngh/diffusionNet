@@ -21,13 +21,27 @@ class DataPreprocessor():
         self.traindata = {}
         self.create_train_dataset(frac, N_f)
         
-        ## Save figure ##        
-        self.fig.savefig('results/ground_truth.png')
+        # ## Save figure ##        
+        # self.fig.savefig('results/ground_truth.png')
+
+    # initial conditions --- given at x -- get the output u at time = 0 (only function of 
+    # if initial conditions are not zero then get the value from h
+    def initial_condition_function(self, X_init):
+        return np.array([[0]*X_init.shape[0]]).reshape(X_init.shape)
+    
+        # bc would be function of time. at left x = 0 and at right x = l 
+        # only possible to define it for Dirichlet boundary condition (so not possible for left_boundary_condition)
+    def left_boundary_condition_function(self, T_left):
+        #du/dt = 0 - cant be defined on grid values - return None 
+        return np.array([[0]*T_left.shape[0]]).reshape(T_left.shape)
+    
+    def right_boundary_condition_function(self, T_right):
+        # u (l,t) is sin(t)
+        return np.array([[math.sin(value) for value in T_right]]).reshape(T_right.shape)
         
     ## Function to create the ground truth over the domain from the numerical solver data
     def create_ground_truth(self):
-
-        ## Exctract the data
+        # Exctract the data
         t = self.sol['t'].flatten()[:,None]
         x = self.sol['x'].flatten()[:,None]
         u = np.real(self.sol['u'])
@@ -59,7 +73,6 @@ class DataPreprocessor():
 
     ## Function to create dataset out of provided grid and function values
     def create_train_dataset(self, frac, N_f):
-        
         ## Extract the exact solution ##
         data = self.sol
         t = data['t'].flatten()[:,None]
@@ -75,39 +88,37 @@ class DataPreprocessor():
         X, T = np.meshgrid(x,t)
         inp = np.hstack((X.flatten()[:,None], T.flatten()[:,None]))
         out = u.flatten()[:,None]     
-        
-        
         ## Start picking random points ##
-            ## from initial condition
+            ## Initial condition 
         train_ic = {}
         inp_ic = np.hstack((X[:1,:].T, T[:1,:].T))
-        out_ic = u[:1,:].T
+        out_ic = self.initial_condition_function(X[:1, :].T)
         idx_ic = np.random.choice(inp_ic.shape[0], N_ic, replace=False)
         train_ic.update({'inp': inp_ic[idx_ic, :], 
                          'out': out_ic[idx_ic, :]})
-#         self.ax.scatter(train_ic['inp'][:,0], train_ic['inp'][:,1], marker='x',
-#                         c = 'k', s=15, clip_on=False, alpha=0.8,
-#                         linewidth=1)
+        # self.ax.scatter(train_ic['inp'][:,0], train_ic['inp'][:,1], marker='x',
+        #                 c = 'k', s=15, clip_on=False, alpha=0.8,
+        #                 linewidth=1)
             ## from left boundary condition
         train_bcl = {}
         inp_bcl = np.hstack((X[:,:1], T[:,:1]))
-        out_bcl = u[:,:1]
+        out_bcl = self.left_boundary_condition_function(T[:,:1])
         idx_bcl = np.random.choice(inp_bcl.shape[0], N_bc, replace=False)
         train_bcl.update({'inp': inp_bcl[idx_bcl, :], 
                           'out': out_bcl[idx_bcl, :]})  
-#         self.ax.scatter(train_bcl['inp'][:,0], train_bcl['inp'][:,1], marker='x',
-#                         c = 'k', s=15, clip_on=False, alpha=0.8,
-#                         linewidth=1)
+        # self.ax.scatter(train_bcl['inp'][:,0], train_bcl['inp'][:,1], marker='x',
+        #                 c = 'k', s=15, clip_on=False, alpha=0.8,
+        #                 linewidth=1)
             ## from right boundary condition
         train_bcr = {}
         inp_bcr = np.hstack((X[:,-1:], T[:,-1:]))
-        out_bcr = u[:,-1:]
+        out_bcr = self.right_boundary_condition_function(T[:,-1:])
         idx_bcr = np.random.choice(inp_bcr.shape[0], N_bc, replace=False)
         train_bcr.update({'inp': inp_bcr[idx_bcr, :], 
                           'out': out_bcr[idx_bcr, :]})    
-#         self.ax.scatter(train_bcr['inp'][:,0], train_bcr['inp'][:,1], marker='x',
-#                         c = 'k', s=15, clip_on=False, alpha=0.8,
-#                         linewidth=1)
+        # self.ax.scatter(train_bcr['inp'][:,0], train_bcr['inp'][:,1], marker='x',
+        #                 c = 'k', s=15, clip_on=False, alpha=0.8,
+        #                 linewidth=1)
             ## from the domain
         train_dom = {}
         inp_dom = np.hstack((X[1:,1:-1].flatten()[:, None],
@@ -116,21 +127,21 @@ class DataPreprocessor():
         idx_dom = np.random.choice(inp_dom.shape[0], N_d, replace=False)
         train_dom.update({'inp': inp_dom[idx_dom, :], 
                           'out': out_dom[idx_dom, :]})
-#         self.ax.scatter(train_dom['inp'][:,0], train_dom['inp'][:,1], marker='.',
-#                         c = 'k', s=15, clip_on=False, alpha=0.5, linewidth=1)
+        # self.ax.scatter(train_dom['inp'][:,0], train_dom['inp'][:,1], marker='.',
+        #                 c = 'k', s=15, clip_on=True, alpha=0.5, linewidth=1)
             ## from the PDE
         train_pde = {}
         lb = inp.min(0)
         ub = inp.max(0) 
         inp_pde = lb + (ub-lb)*lhs(2, N_f)
         train_pde.update({'inp': inp_pde})
-#         self.ax.scatter(train_pde['inp'][:,0], train_pde['inp'][:,1], marker='+',
-#                         c = 'k', s=15, clip_on=False, alpha=0.8, linewidth=1)
+        # self.ax.scatter(train_pde['inp'][:,0], train_pde['inp'][:,1], marker='+',
+        #                 c = 'k', s=15, clip_on=False, alpha=0.8, linewidth=1)
             ## Package all the dictionaries into traindata
         self.traindata.update({'ic': train_ic, 'bcl': train_bcl, 
                                'bcr': train_bcr, 'dom': train_dom,
                                'pde': train_pde})
-
+                               
 # the deep neural network
 class DNN(torch.nn.Module):
     def __init__(self, layers):

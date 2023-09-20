@@ -8,7 +8,7 @@ import torch
 from collections import OrderedDict
 from scipy.interpolate import griddata
 import pickle as pkl
-from pyDOE import lhs
+import math
 
 # CUDA support
 if torch.cuda.is_available():
@@ -21,7 +21,15 @@ if importlib.util.find_spec('pde') is None:
     print('py-pde' +" is not installed")
     os.system('pip install py-pde')
     print('py-pde' +" is now installed")
+    
+# Check if pyDOE is installed ##
+if importlib.util.find_spec('pyDOE') is None:
+    print('pyDOE' +" is not installed")
+    os.system('pip install pyDOE')
+    print('pyDOE' +" is now installed")
 
+
+from pyDOE import lhs
 from pde import PDE, CartesianGrid, ScalarField, MemoryStorage, plot_kymograph
 from pde import Controller, ExplicitSolver, ScipySolver, ImplicitSolver
 
