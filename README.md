@@ -1,5 +1,5 @@
 ## $${\color{blue}\mathbf{Solution \space of \space 1D \space transient \space diffusion \space PDE \space using \space Neural \space Networks}}$$ ##
-$${\color{blue} Solution \space of \space 1D \space transient \space diffusion \space PDE \space using \space Neural \space Networks}$$
+$${\color{blue} \text{ Solution of \space 1D \space transient \space diffusion \space PDE \space using \space Neural \space Networks}}$$
 
 ### $${\color{red}\mathbf{Problem \space defintion}}$$ ###
 
