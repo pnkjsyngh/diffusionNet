@@ -76,4 +76,4 @@ As it can be noted, we have presented the loss as simple sum of losses coming fr
 
 ---
 
-$${\color{red} \large \textbf{Coming Soon: Constant weights for loss, hyperparameter tuning & self adaptive weights}}$$
+$${\color{red} \large \textbf{Coming Soon: Constant weights for loss, hyperparameter tuning \& self adaptive weights}}$$
