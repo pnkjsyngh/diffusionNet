@@ -72,3 +72,8 @@ As it can be noted, we have presented the loss as simple sum of losses coming fr
 <p align="center">
   <img src="./PINN_unweighted_loss/only%20physics/results/slices.png">
 </p>
+
+
+---
+
+$${\color{red} \large \textbf{Coming Soon: Constant weights for loss components, hyperparameter tuning of weights and self adaptive weights}}$$
