@@ -45,7 +45,9 @@ The specified functions are as follows,
   <img src="./PINN_unweighted_loss/only%20physics/results/ground_truth.png", width=400px>
 </p>
 
-### $${\color{red}\mathbf{\text{Physics Informed Neural Networks (PINNs) with unweighted loss function}}}$$ ###
+---
+
+$${\color{red} \large \textbf{Physics Informed Neural Networks (PINNs) with unweighted loss function}}$$
 
 We define the fully physics based loss function as follows for training our neural network,
 
