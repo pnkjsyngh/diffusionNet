@@ -26,6 +26,8 @@ $i(x)$ is the initial temperature distribution on the domain,<br>
 $a(t)$ and $b(t)$ are time dependent boundary conditions terms at $x=0$ and $l$ respectively.
 <br>
 
+---
+
 $${\color{red} \large \textbf{Numerical Solution}}$$
 
 The numerical solution for this problem is obtained using [py-pde](https://py-pde.readthedocs.io/en/latest/) for following set of system parameters,
