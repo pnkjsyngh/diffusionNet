@@ -2,7 +2,7 @@
 
 ### $${\color{red}\mathbf{Problem \space defintion}}$$ ###
 
-The governing PDE for 1D diffusion is given by,
+The governing PDE for 1D diffusion is given by ,
 
 $$\\frac{\\partial T}{\\partial t} = D \\frac{\\partial^2 T}{\\partial x^2} + s(x,t)$$ 
 
