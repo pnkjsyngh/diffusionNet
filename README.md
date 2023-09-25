@@ -76,4 +76,9 @@ As it can be noted, we have presented the loss as simple sum of losses coming fr
 
 ---
 
-$${\color{red} \textbf{Coming Soon: Constant weights for loss, hyperparameter tuning and self adaptive weights}}$$
+$${\color{red} \textbf{Coming Soon}}$$
+- Constant weights for loss components
+- hyperparameter tuning
+- self adaptive weights
+- Curriculum learning
+- Seq2Seq learning
